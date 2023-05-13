@@ -10,10 +10,26 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
+model Chirp {
+    id String @id @default(uuid())
+    userId String
+    content String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    likes Like[]
+
+    @@index([userId])
+}
+
+model Like {
+    userId String
+    chirpId String
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Chirp Chirp @relation(fields: [chirpId], references: [id], onDelete: Cascade)
+
+    @@id([userId, chirpId])
+    @@index([userId])
+    @@index([chirpId])
 }
 
 // Necessary for Next auth
@@ -54,6 +70,12 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+
+    // Non-Next-Auth
+    chirps        Chirp[]
+    likes         Like[]
+    followers     User[]    @relation(name: "Followers")
+    following     User[]    @relation(name: "Followers")
 }
 
 model VerificationToken {
