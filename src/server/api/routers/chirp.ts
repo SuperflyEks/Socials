@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { inferAsyncReturnType } from "@trpc/server";
-import { TypeOf, z } from "zod";
-import { InfiniteChirpList } from "~/components/InfiniteChirpList";
+import { z } from "zod";
 
 import {
   createTRPCRouter,
@@ -21,7 +20,7 @@ export const chirpRouter = createTRPCRouter({
         limit, 
         ctx, 
         cursor, 
-        whereClause: { userId }
+        whereClause: { userId },
       });
     }),
   infiniteFeed: publicProcedure.input(
@@ -31,19 +30,19 @@ export const chirpRouter = createTRPCRouter({
       cursor: z.object({ id:z.string(), createdAt: z.date() }).optional(),
     })
   ).query(async ({ input: { limit = 10, onlyFollowing = false ,cursor }, ctx }) => {
-    const currenUserId = ctx.session?.user.id
+    const currenUserId = ctx.session?.user.id;
 
     return await getInfiniteChirps({ 
       limit, 
       ctx, 
       cursor, 
-      whereClause: currenUserId || !onlyFollowing 
+      whereClause: currenUserId == null || !onlyFollowing 
         ? undefined 
         : {
             user: {
               followers: { some: { id: currenUserId } },
             },
-          } 
+          }, 
     });
   }),
   create: protectedProcedure
@@ -59,7 +58,7 @@ export const chirpRouter = createTRPCRouter({
   toggleLike: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input: {id}, ctx }) => {
-      const data = { chirpId: id, userId: ctx.session };
+      const data = { chirpId: id, userId: ctx.session.user.id };
 
       const existingLike = await ctx.prisma.like.findUnique({
         where: { userId_chirpId: data } 
@@ -101,15 +100,15 @@ async function getInfiniteChirps({
       user: { select: { name: true, id: true, image: true } }
     }
   })
-  let nextCursor: typeof cursor | undefined
+  let nextCursor: typeof cursor | undefined;
   if (data.length > limit) {
-    const nextItem = data.pop()
+    const nextItem = data.pop();
     if (nextItem != null) {
       nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt }
     }
   }
 
-  return {chirps: data.map(chirp => {
+  return {chirps: data.map((chirp) => {
     return {
       id: chirp.id,
       content: chirp.content,

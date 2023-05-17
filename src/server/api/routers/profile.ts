@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { inferAsyncReturnType } from "@trpc/server";
-import { TypeOf, z } from "zod";
-import { InfiniteChirpList } from "~/components/InfiniteChirpList";
+import { z } from "zod";
 
 import {
   createTRPCRouter,
@@ -13,6 +12,7 @@ import {
 export const profileRouter = createTRPCRouter({
     getById: publicProcedure.input(z.object({ id: z.string()}))
                             .query(async ({ input: {id}, ctx}) => {
+                                const currentUserId = ctx.session?.user.id;
                                 const profile = await ctx.prisma.user.findUnique({ 
                                     where: {id}, 
                                     select: {

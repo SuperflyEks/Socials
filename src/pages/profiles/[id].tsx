@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { GetStaticPaths, GetStaticPropsContext, InferGetServerSidePropsType, NextPage } from "next";
 import { ssgHelper } from "~/server/api/ssgHelper";
 import Head from "next/head";
@@ -7,37 +9,39 @@ import Link from "next/link";
 import { IconHoverEffect } from "~/components/IconHoverEffect";
 import { VscArrowLeft } from "react-icons/vsc";
 import { ProfileImage } from "~/components/ProfileImage";
-import internal from "stream";
 import { InfiniteChirpList } from "~/components/InfiniteChirpList";
 import { Button } from "~/components/Button";
 import { useSession } from "next-auth/react";
 
-const ProfilePage: Nextpage<InferGetServerSidePropsType<typeof getStaticProps>> = ({ id, }) => {
+const ProfilePage: NextPage<InferGetServerSidePropsType<typeof getStaticProps>> = ({ id, }) => {
     const { data: profile } = api.profile.getById.useQuery({id});
-    const chirps = api.chirp.infiniteFeed.useInfiniteQuery(
+    const chirps = api.chirp.infiniteProfileFeed.useInfiniteQuery(
                                             { userId: id },
                                             { getNextPageParam: (lastPage) => lastPage.nextCursor }
-    )                         
+    );                         
     const trpcUtils = api.useContext();
     const toggleFollow = api.profile.toggleFollow.useMutation({ onSuccess: ({ addedFollow }) => {
-                                                                trpcUtils.profile.getId.setData({id}, oldData => {
+                                                                trpcUtils.profile.getById.setData({id}, oldData => {
                                                                     if(oldData == null) return
 
-                                                                    const countModifier = addedFollow? 1 : -1
+                                                                    const countModifier = addedFollow ? 1 : -1
                                                                     return {
                                                                         ...oldData,
                                                                         isFollowing: addedFollow,
+                                                                        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                                                                         followersCount: oldData.followersCount + countModifier,
                                                                     }
                                                                 })
                                                             }}
     )
-    if (profile == null || profile.name == null) return <ErrorPage statusCode={404}/>
+    if (profile == null || profile.name == null) {
+        return <ErrorPage statusCode={404}/>
+    }
 
     return ( 
         <>
             <Head>
-                <title>{`Chirper - ${user.name}`}</title>
+                <title>{`Chirper - ${profile.name}`}</title>
             </Head>
             <header className="sticky top-0 z-10 flex items-center border-b bg-white px-4 py-2">
                 <Link href=".." className="mr-2">

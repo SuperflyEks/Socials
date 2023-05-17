@@ -38,12 +38,12 @@ const Home: NextPage = () => {
         )}
       </header>
       <NewChirpForm/>
-      {selectedTab === "Recent" ? <RecentChirp/> : <FollowingChirp/>}
+      {selectedTab === "Recent" ? <RecentChirps/> : <FollowingChirps/>}
     </>
   );
 };
 
-function RecentChirp() {
+function RecentChirps() {
   const chirps = api.chirp.infiniteFeed.useInfiniteQuery(
     {},
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
@@ -60,7 +60,7 @@ function RecentChirp() {
   );
 }
 
-function FollowingChirp() {
+function FollowingChirps() {
   const chirps = api.chirp.infiniteFeed.useInfiniteQuery(
     { onlyFollowing: true },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
