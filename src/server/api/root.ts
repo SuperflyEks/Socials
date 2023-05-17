@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "~/server/api/trpc";
 import { chirpRouter } from "~/server/api/routers/chirp";
+import { profileRouter } from "./routers/profile";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { chirpRouter } from "~/server/api/routers/chirp";
  */
 export const appRouter = createTRPCRouter({
   chirp: chirpRouter,
+  profile: profileRouter,
 });
 
 // export type definition of API

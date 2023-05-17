@@ -25,6 +25,7 @@ function Form() {
         updateTextAreaSize(textArea);
         textAreaRef.current = textArea;
     }, []);
+    const trpcUtils = api.useContext();
 
     useLayoutEffect(() => {
         updateTextAreaSize(textAreaRef.current);
@@ -33,6 +34,34 @@ function Form() {
     const createChirp = api.chirp.create.useMutation({
         onSuccess: (newChirp) => {
             setInputValue("");
+
+            if ( session.status !== "authenticated") return
+
+            trpcUtils.chirp.infiniteFeed.setInfiniteData({}, (oldData) => {
+                if (oldData == null || oldData.pages[0] == null) return
+
+                const newCacheChirp = {
+                    ...newChirp,
+                    likeCount: 0,
+                    likedByMe: false,
+                    user: {
+                        id: session.data.user.id,
+                        name: session.data.user.name || null,
+                        image: session.data.user.image || null,
+                    }
+                }
+                return {
+                    ...oldData,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    pages: [
+                        {
+                        ...oldData.pages[0],
+                        chirp: [newCacheChirp, ...oldData.pages[0].chirps],
+                        },
+                        ...oldData.pages.slice(1),
+                    ]
+                }
+            })
         },
     });
 
@@ -50,13 +79,14 @@ function Form() {
                 <div className="flex gap-4">
                     <ProfileImage src={session.data.user.image}/>
                     <textarea 
-                    ref={inputRef}
-                    style={{ height: 0 }}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="flex-grow resize-none 
-                    overflow-hidden p-4 text-lg outline-none" 
-                    placeholder="What's Happenning?"/>
+                        ref={inputRef}
+                        style={{ height: 0 }}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        className="flex-grow resize-none 
+                        overflow-hidden p-4 text-lg outline-none" 
+                        placeholder="What's Happenning?"
+                    />
                 </div>
                 <Button className="self-end">Chirp</Button>
             </form>

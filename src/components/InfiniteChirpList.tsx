@@ -3,6 +3,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { ProfileImage } from "./ProfileImage";
 import { useSession } from "next-auth/react";
 import { VscHeartFilled, VscHeart } from "react-icons/vsc";
+import { IconHoverEffect } from "./IconHoverEffect";
+import { api } from "~/utils/api";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 type Chirp = {
     id: string;
@@ -16,13 +19,13 @@ type Chirp = {
 type InfiniteChirpListProps = {
     isLoading: boolean;
     isError: boolean;
-    hasMore: boolean;
+    hasMore: boolean | undefined;
     fetchNewChirps: () => Promise<unknown>;
     chirps?: Chirp[];
 };
 
-export function InfiniteChirpList({ chirps, fetchNewChirps, hasMore, isError, isLoading} : InfiniteChirpListProps) {
-    if (isLoading) return <h1>Loading...</h1>;
+export function InfiniteChirpList({ chirps, fetchNewChirps, hasMore = false, isError, isLoading} : InfiniteChirpListProps) {
+    if (isLoading) return <LoadingSpinner/>;
     if (isError) return <h1>Error...</h1>;
 
     if (chirps == null || chirps.length === 0) {
@@ -40,7 +43,7 @@ export function InfiniteChirpList({ chirps, fetchNewChirps, hasMore, isError, is
                     dataLength={chirps.length}
                     next={fetchNewChirps}
                     hasMore={hasMore}
-                    loader={"Loading..."}
+                    loader={<LoadingSpinner/>}
                 >
                     {chirps.map((chirp) => {
                         return (
@@ -60,6 +63,44 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp) {
+    const trpcUtils = api.useContext();
+    const toggleLike = api.chirp.toggleLike.useMutation({
+        onSuccess: ({ addedLike }) => {
+            const updateData: Parameters<typeof trpcUtils.chirp.infiniteFeed.setInfiniteData>[1] = (oldData) => {
+                if (oldData == null) return
+
+                const countModifier = addedLike ? 1 : -1
+
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map(page => {
+                        return {
+                            ...page,
+                            chirps: page.chirps.map(chirp => {
+                                if (chirp.id === id) {
+                                    return {
+                                        ...chirp,
+                                        likeCount: chirp.likeCount + countModifier,
+                                        likedByMe: addedLike
+                                    }
+                                }
+                                return chirp
+                            })
+                        }
+                    })
+                }
+            }
+
+            trpcUtils.chirp.infiniteFeed.setInfiniteData({}, updateData);
+            trpcUtils.chirp.infiniteFeed.setInfiniteData({ onlyFollowing: true }, updateData);
+            trpcUtils.chirp.infiniteFeed.setInfiniteData({ userId: user.id }, updateData);
+        }
+    });
+
+    function handleToggleLike() {
+        toggleLike.mutate({ id });
+    }
+    
     return (
         <>
             <li className="flex gap-4 border-b px-4 py-4">
@@ -78,7 +119,7 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
                         <span className="text-gray-500">{dateTimeFormatter.format(createdAt)}</span>
                     </div>
                     <p className="whitespace-pre-wrap">{content}</p>
-                    <HeartButton/>
+                    <HeartButton onClick={handleToggleLike} isloading={toggleLike.isLoading} likedByMe={likedByMe} likeCount={likeCount}/>
                 </div>
             </li>
         </>
@@ -86,11 +127,13 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
 }
 
 type HeartButtonProps = {
+    onClick: () => void;
+    isLoading: boolean;
     likedByMe: boolean;
     likeCount: number;
 }
 
-function HeartButton({likedByMe, likeCount}: HeartButtonProps) {
+function HeartButton({isLoading, onClick, likedByMe, likeCount}: HeartButtonProps) {
     const session = useSession();
     const HeartIcon = likedByMe ? VscHeartFilled : VscHeart;
 
@@ -107,15 +150,17 @@ function HeartButton({likedByMe, likeCount}: HeartButtonProps) {
     
     return (
         <>
-            <button className={`group flex items-center gap-1 self-start transition-colors duration-200 
+            <button disabled={isLoading} onClick={onClick} className={`group flex items-center gap-1 -ml-2 self-start transition-colors duration-200 
                 ${likedByMe ? "text-red-500" : "text-gray-500 hover:text-red-500 focus-visible:text-red-500"}`}
             >
-                <HeartIcon
-                    className={`transition-colors duration-200 ${
-                        likedByMe ? "fill-red-500" 
-                        : "group-hover:fill-red-500 fill-gray-500 group-focus-visible:fill-red-500"
-                    }`}
-                />
+                <IconHoverEffect red>
+                    <HeartIcon
+                        className={`transition-colors duration-200 ${
+                            likedByMe ? "fill-red-500" 
+                            : "group-hover:fill-red-500 fill-gray-500 group-focus-visible:fill-red-500"
+                        }`}
+                    />
+                </IconHoverEffect>
             </button>
         </>
     )
