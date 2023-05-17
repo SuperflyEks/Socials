@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ProfileImage } from "./ProfileImage";
@@ -80,6 +81,7 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
                                 if (chirp.id === id) {
                                     return {
                                         ...chirp,
+                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                         likeCount: chirp.likeCount + countModifier,
                                         likedByMe: addedLike
                                     }
@@ -119,7 +121,12 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
                         <span className="text-gray-500">{dateTimeFormatter.format(createdAt)}</span>
                     </div>
                     <p className="whitespace-pre-wrap">{content}</p>
-                    <HeartButton onClick={handleToggleLike} isloading={toggleLike.isLoading} likedByMe={likedByMe} likeCount={likeCount}/>
+                    <HeartButton 
+                        onClick={handleToggleLike} 
+                        isLoading={toggleLike.isLoading} 
+                        likedByMe={likedByMe} 
+                        likeCount={likeCount}
+                    />
                 </div>
             </li>
         </>
