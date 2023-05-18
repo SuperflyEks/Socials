@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Prisma } from "@prisma/client";
 import { inferAsyncReturnType } from "@trpc/server";
 import { z } from "zod";
@@ -21,11 +22,11 @@ export const profileRouter = createTRPCRouter({
                                         _count: {
                                             select: {
                                                 followers: true,
-                                                follows: true,
+                                                following: true,
                                                 chirps: true,
                                             }
                                         },
-                                        followers: currentUserid == null 
+                                        followers: currentUserId == null 
                                                                     ? undefined 
                                                                     : {  where: { id: currentUserId} },
                                     },
@@ -35,7 +36,7 @@ export const profileRouter = createTRPCRouter({
                                     name: profile.name,
                                     image: profile.image,
                                     followersCount: profile._count.followers,
-                                    followsCount: profile._count.follows,
+                                    followsCount: profile._count.following,
                                     chirpsCount: profile._count.chirps,
                                     isFollowing: profile.followers.length > 0,
                                 }
