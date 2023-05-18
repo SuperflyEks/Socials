@@ -96,7 +96,7 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
 
             trpcUtils.chirp.infiniteFeed.setInfiniteData({}, updateData);
             trpcUtils.chirp.infiniteFeed.setInfiniteData({ onlyFollowing: true }, updateData);
-            trpcUtils.chirp.infiniteFeed.setInfiniteData({ userId: user.id }, updateData);
+            // trpcUtils.chirp.infiniteFeed.setInfiniteData({ userId: user.id }, updateData);
         }
     });
 
