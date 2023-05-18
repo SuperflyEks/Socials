@@ -7,6 +7,7 @@ import { VscHeartFilled, VscHeart } from "react-icons/vsc";
 import { IconHoverEffect } from "./IconHoverEffect";
 import { api } from "~/utils/api";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingError } from "./LoadingError";
 
 type Chirp = {
     id: string;
@@ -27,7 +28,7 @@ type InfiniteChirpListProps = {
 
 export function InfiniteChirpList({ chirps, fetchNewChirps, hasMore = false, isError, isLoading} : InfiniteChirpListProps) {
     if (isLoading) return <LoadingSpinner/>;
-    if (isError) return <h1>Error...</h1>;
+    if (isError) return <LoadingError/>;
 
     if (chirps == null || chirps.length === 0) {
         return (
