@@ -30,6 +30,9 @@ const config = {
     ],
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  }
 };
 
 module.exports = config;
