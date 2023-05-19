@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Prisma } from "@prisma/client";
-import { inferAsyncReturnType } from "@trpc/server";
 import { z } from "zod";
 
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
-  createTRPCContext,
 } from "~/server/api/trpc";
 
 export const profileRouter = createTRPCRouter({
