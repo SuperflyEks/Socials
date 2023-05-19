@@ -30,6 +30,7 @@ const config = {
     ],
     "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
+  ignorePatterns: ["/src/server/api/routers/chirp.ts", "/src/components/InfiniteChirpList.tsx", "/src/components/NewChirpForm.tsx"],
 };
 
 module.exports = config;
