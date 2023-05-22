@@ -1,4 +1,4 @@
-# Create T3 App
+<!-- # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
@@ -25,4 +25,14 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 
 ## How do I deploy this?
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information. -->
+
+#Socials Chirp App
+
+This is a tweeter-clone project built with the T3 Stack(https://create.t3.gg/)
+
+Here's an image of the app
+
+![Socials App](socials.png)
+
+This is the link to the [Socials](https://socials-git-main-superflyeks.vercel.app/) app
