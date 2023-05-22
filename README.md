@@ -29,7 +29,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 #Socials Chirp App
 
-This is a tweeter-clone project built with the T3 Stack(https://create.t3.gg/)
+This is a tweeter-clone project built with the [T3 Stack](https://create.t3.gg/)
 
 Here's an image of the app
 
