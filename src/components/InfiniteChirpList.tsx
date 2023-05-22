@@ -75,10 +75,10 @@ function ChirpCard({ id, user, content, createdAt, likeCount, likedByMe} : Chirp
 
                 return {
                     ...oldData,
-                    pages: oldData.pages.map(page => {
+                    pages: oldData.pages.map((page) => {
                         return {
                             ...page,
-                            chirps: page.chirps.map(chirp => {
+                            chirps: page.chirps.map((chirp) => {
                                 if (chirp.id === id) {
                                     return {
                                         ...chirp,

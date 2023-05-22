@@ -56,7 +56,7 @@ function Form() {
                     pages: [
                         {
                         ...oldData.pages[0],
-                        chirp: [newCacheChirp, ...oldData.pages[0].chirps],
+                        chirps: [newCacheChirp, ...oldData.pages[0].chirps],
                         },
                         ...oldData.pages.slice(1),
                     ]
